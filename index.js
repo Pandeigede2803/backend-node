@@ -13,6 +13,9 @@ const Product = require("./models/products");
 const User = require("./models/user");
 const Cart = require("./models/cart");
 const CartItem = require("./models/cartitem");
+const Image = require("./models/imageproducts");
+const Orders = require("./models/orders");
+const OrdersItems = require("./models/ordersitems")
 
 console.log('start express node server....')
 
@@ -28,6 +31,8 @@ Product.belongsTo(User,{constaints : true, onDelete:"CASCADE"});
 User.hasMany(Product);
 //user memiliki satu CART
 User.hasOne(Cart);
+//user punya banyak order
+User.hasMany(Orders);
 //cart dimiliki satu cart
 Cart.belongsTo(User);
 
@@ -37,6 +42,35 @@ Cart.belongsTo(User);
 
 Cart.belongsToMany(Product,{through:CartItem});
 Product.belongsToMany(Cart,{through:CartItem});
+
+Image.belongsTo(Product, { foreignKey: 'productId' , as: 'images'});
+Product.hasMany(Image, { foreignKey: 'productId' , as: 'images' });
+
+
+//orders dimiliki oleh 1 user
+//Ini berarti bahwa model Order memiliki hubungan "belongsTo" dengan User.
+//Setiap Order dimiliki oleh satu User.
+Orders.belongsTo(User);
+
+
+
+//Orders bisa dimilii oleh banyak prdouct, dan product bisa dimiliki oleh banyak ordersItem
+//Ini berarti bahwa model Order memiliki hubungan "belongsToMany" dengan Product melalui model OrderItem.
+//Ini mengindikasikan bahwa setiap Order dapat memiliki banyak Product melalui OrderItem.
+//Sebaliknya, setiap Product juga dapat terhubung ke banyak Order melalui OrderItem.
+Orders.belongsToMany(Product, { through: OrdersItems });
+
+//Ini adalah kebalikan dari hubungan di atas.
+//Ini mengindikasikan bahwa setiap Product juga dapat memiliki banyak Order melalui OrderItem.
+//Sebaliknya, setiap Order juga dapat memiliki banyak Product melalui OrderItem.
+Product.belongsToMany(Orders, { through: OrdersItems });
+
+Orders.hasMany(OrdersItems, { foreignKey: 'orderId' });
+
+OrdersItems.belongsTo(Product, { foreignKey: 'productId' });
+OrdersItems.belongsTo(Orders, { foreignKey: 'orderId' });
+
+// Orders.hasMany(OrdersItems, { foreignKey: 'orderId' });
 
 //menentukan Find the user = user id :2
 //user id ter set otomatis di userId:2

@@ -56,6 +56,21 @@ const Product = sequelize.define('products', {
         allowNull: false
     },
     userId: Sequelize.INTEGER,
+    colors: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        get() {
+          const rawValue = this.getDataValue('colors');
+          return rawValue ? rawValue.split(';') : [];
+        },
+        set(val) {
+          if (Array.isArray(val)) {
+            this.setDataValue('colors', val.join(';'));
+          } else {
+            this.setDataValue('colors', val);
+          }
+        },
+      },
     
 },
 {

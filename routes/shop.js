@@ -28,6 +28,14 @@ router.post("/ngedit-cartitem", shopController.postEditAddCartItem);
 router.delete("/musnahkan-cartitem", shopController.deleteCartItem);
 router.get("/musnahkan-cart", shopController.deleteCart);
 
+router.post("/create-order",shopController.createOrder);
+router.get("/orders",shopController.getOrders);
+
+router.post("/create-order-item",shopController.createOrderItem);
+
+// router.get("/get-order-item",shopController.getOrdersWithOrderItems);
+
+router.get("/get-order-withId",shopController.getOrdersByOrderId)
 
 
 

@@ -46,6 +46,12 @@ router.get("/nyarik-user-product/:id", productsController.getUserProducts);
 //admin/delete-products
 router.delete("/delete-product", productsController.postDeleteProduct);
 
+router.get("/get-products-image", productsController.getProductImage);
+router.post('/post-image/:productId', productsController.postImage);
+
+
+
+
 
 
 module.exports = router;

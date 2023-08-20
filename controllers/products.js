@@ -64,12 +64,14 @@ const { Op } = require('sequelize');
 const Product = require('../models/products')
 const products = [];
 const User = require('../models/user');
+const ImageProduct = require('../models/imageproducts')
 
 exports.postAddProduct = (req, res, next) => {
     const title = req.body.title;
     const imageUrl = req.body.imageUrl;
     const price = req.body.price;
     const description = req.body.description;
+    const colors = req.body.colors;
 
 
     req.user.createProduct({
@@ -77,6 +79,7 @@ exports.postAddProduct = (req, res, next) => {
         price: parseFloat(price),
         imageUrl: imageUrl,
         description: description,
+        colors: colors,
     
         // userId: req.body.userId
     }).then(result => {
@@ -239,3 +242,75 @@ exports.postDeleteProduct = (req,res,next)=> {
 };
 
 //USER MENAMBAHKAN PRDUCT
+
+//Menambahkan image product di array product
+
+// exports.getProductImage = async (req, res) => {
+//     try {
+//       const { productId } = req.params;
+  
+//       Product.findAll({
+//         where: { id: productId },
+//         include: [{ model: ImageProduct, as: 'image' }]
+//       })
+//         .then((product) => {
+//           res.json(product);
+//         })
+//         .catch((err) => {
+//           console.error("Error retrieving data:", err);
+//           res.status(500).json({ error: "Error retrieving data" });
+//         });
+//     } catch (err) {
+//       console.error("Error retrieving product image:", err);
+//       res.status(500).json({ error: "Error retrieving product image" });
+//     }
+//   };
+
+
+  exports.getProductImage = (req, res,next) => {
+    // const { productId } = req.params.id;
+  
+    Product.findAll({
+    //   where: { id: productId },
+      include: [{ model: ImageProduct , as: 'images' }]
+    }).then((product) => {
+      res.json(product);
+    }).catch((err) => {
+      console.error("Error retrieving data:", err);
+      res.status(500).json({ error: "Error retrieving data" });
+    });
+  };
+
+
+  //uploadimage or POST IMAGE
+  exports.postImage = (req, res, next) => {
+    const { imageUrl, width, height, filename, productId } = req.body;
+  
+    // Check if the product with the specified productId exists
+    Product.findByPk(productId)
+      .then(product => {
+        if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+        }
+  
+        // Create a new image record in the database
+        ImageProduct.create({
+          productId: productId,
+          url: imageUrl,
+          width: width,
+          height: height,
+          filename: filename
+        })
+          .then(image => {
+            res.status(201).json({ message: 'Image posted successfully', image });
+          })
+          .catch(error => {
+            console.error(error);
+            res.status(500).json({ message: 'Image post failed' });
+          });
+      })
+      .catch(error => {
+        console.error(error);
+        res.status(500).json({ message: 'Error checking product' });
+      });
+  };
